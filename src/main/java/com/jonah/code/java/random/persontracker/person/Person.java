@@ -2,10 +2,9 @@ package com.jonah.code.java.random.persontracker.person;
 
 import java.util.HashMap;
 import java.util.Scanner;
-import java.lang.System;
 
 public class Person {
-    public HashMap<String, String> person = new HashMap<String, String>();
+    public HashMap<String, String> person = new HashMap<>();
     public static Scanner sc = new Scanner(System.in);
     public String name() {
         System.out.print("Name, please.\n>> ");
