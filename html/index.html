@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Person Tracker</title>
+    <style>
+        :root {
+            --bg: #f4efe7;
+            --panel: rgba(255, 252, 247, 0.92);
+            --panel-strong: #fffaf3;
+            --ink: #1e1b18;
+            --muted: #645a4f;
+            --line: rgba(57, 45, 33, 0.12);
+            --accent: #0d7a68;
+            --accent-2: #d77a3d;
+            --danger: #a33f3f;
+            --shadow: 0 18px 50px rgba(47, 31, 14, 0.12);
+            --radius: 8px;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: Georgia, "Times New Roman", serif;
+            color: var(--ink);
+            background:
+                radial-gradient(circle at top left, rgba(215, 122, 61, 0.16), transparent 34%),
+                radial-gradient(circle at top right, rgba(13, 122, 104, 0.14), transparent 30%),
+                linear-gradient(180deg, #f8f1e8 0%, #efe5d8 100%);
+        }
+
+        .shell {
+            width: min(1180px, calc(100% - 32px));
+            margin: 24px auto;
+            display: grid;
+            gap: 18px;
+        }
+
+        .hero,
+        .panel {
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(8px);
+        }
+
+        .hero {
+            padding: 28px;
+            display: grid;
+            gap: 18px;
+        }
+
+        .hero-top {
+            display: flex;
+            justify-content: space-between;
+            gap: 18px;
+            align-items: start;
+        }
+
+        h1,
+        h2,
+        h3,
+        p {
+            margin: 0;
+        }
+
+        h1 {
+            font-size: clamp(2.2rem, 5vw, 4.4rem);
+            font-weight: 600;
+            line-height: 0.94;
+        }
+
+        .hero p,
+        .panel p,
+        label,
+        input,
+        select,
+        button,
+        .status,
+        .timeline-note,
+        .empty {
+            font-size: 0.98rem;
+        }
+
+        .lede {
+            max-width: 680px;
+            color: var(--muted);
+            line-height: 1.55;
+        }
+
+        .hero-stats {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 12px;
+        }
+
+        .stat {
+            background: var(--panel-strong);
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+            padding: 16px;
+        }
+
+        .stat-label {
+            color: var(--muted);
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-size: clamp(1.6rem, 3vw, 2.6rem);
+            font-weight: 600;
+        }
+
+        .layout {
+            display: grid;
+            grid-template-columns: 1.05fr 0.95fr;
+            gap: 18px;
+        }
+
+        .panel {
+            padding: 20px;
+        }
+
+        .panel-grid {
+            display: grid;
+            gap: 18px;
+        }
+
+        .forms {
+            display: grid;
+            gap: 18px;
+        }
+
+        .form-card {
+            background: var(--panel-strong);
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+            padding: 18px;
+            display: grid;
+            gap: 14px;
+        }
+
+        .section-head {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            align-items: baseline;
+        }
+
+        .section-head p {
+            color: var(--muted);
+        }
+
+        form {
+            display: grid;
+            gap: 12px;
+        }
+
+        .field-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+        }
+
+        label {
+            display: grid;
+            gap: 6px;
+            color: var(--muted);
+        }
+
+        input,
+        select,
+        button {
+            font: inherit;
+        }
+
+        input,
+        select {
+            width: 100%;
+            border: 1px solid rgba(57, 45, 33, 0.18);
+            border-radius: 6px;
+            background: #fffdf9;
+            padding: 12px 13px;
+            color: var(--ink);
+        }
+
+        input:focus,
+        select:focus {
+            outline: 2px solid rgba(13, 122, 104, 0.24);
+            border-color: var(--accent);
+        }
+
+        button {
+            border: 0;
+            border-radius: 6px;
+            padding: 12px 16px;
+            color: white;
+            background: linear-gradient(135deg, var(--accent), #0b5f52);
+            cursor: pointer;
+            transition: transform 140ms ease, filter 140ms ease;
+        }
+
+        button:hover {
+            transform: translateY(-1px);
+            filter: brightness(1.02);
+        }
+
+        button.secondary {
+            background: linear-gradient(135deg, var(--accent-2), #b35a23);
+        }
+
+        button.ghost {
+            background: #f1e7d8;
+            color: var(--ink);
+        }
+
+        .status {
+            min-height: 1.4em;
+            color: var(--muted);
+        }
+
+        .status.error {
+            color: var(--danger);
+        }
+
+        .status.success {
+            color: var(--accent);
+        }
+
+        .people-list {
+            display: grid;
+            gap: 12px;
+        }
+
+        .person-card {
+            background: var(--panel-strong);
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+            padding: 16px;
+            display: grid;
+            gap: 10px;
+        }
+
+        .person-card header {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .pill {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 6px 10px;
+            border-radius: 999px;
+            background: #e6f2ef;
+            color: #0d5f51;
+            font-size: 0.84rem;
+        }
+
+        .pill.warn {
+            background: #f7e8dc;
+            color: #9b5227;
+        }
+
+        .pill.alert {
+            background: #f6e1e1;
+            color: #893434;
+        }
+
+        .meta {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 8px 14px;
+            color: var(--muted);
+        }
+
+        .timeline {
+            display: grid;
+            gap: 8px;
+        }
+
+        .timeline-note {
+            padding-left: 12px;
+            border-left: 2px solid rgba(13, 122, 104, 0.26);
+            color: var(--muted);
+            line-height: 1.45;
+        }
+
+        .empty {
+            color: var(--muted);
+            padding: 24px 0;
+        }
+
+        @media (max-width: 940px) {
+            .layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 680px) {
+            .hero-top,
+            .section-head,
+            .person-card header {
+                flex-direction: column;
+                align-items: start;
+            }
+
+            .hero-stats,
+            .field-grid,
+            .meta {
+                grid-template-columns: 1fr;
+            }
+
+            .shell {
+                width: min(100% - 20px, 1180px);
+                margin: 10px auto 20px;
+            }
+
+            .hero,
+            .panel {
+                padding: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <main class="shell">
+        <section class="hero">
+            <div class="hero-top">
+                <div>
+                    <p class="pill">Browser version of the Java tracker</p>
+                    <h1>Person Tracker</h1>
+                </div>
+                <button class="ghost" id="resetButton" type="button">Clear saved data</button>
+            </div>
+            <p class="lede">
+                This page turns the Java classes in `src/main/java` into a working interface. It keeps person records,
+                tracks marriage status, records divorce years, and stores everything in MongoDB through a small Java API.
+            </p>
+            <div class="hero-stats">
+                <div class="stat">
+                    <div class="stat-label">People stored</div>
+                    <div class="stat-value" id="peopleCount">0</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-label">Currently married</div>
+                    <div class="stat-value" id="marriedCount">0</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-label">Divorced records</div>
+                    <div class="stat-value" id="divorcedCount">0</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="layout">
+            <div class="panel panel-grid">
+                <div class="section-head">
+                    <div>
+                        <h2>Tracker actions</h2>
+                        <p>Built from the Java `Person`, `Marriage`, and `Divorce` flows.</p>
+                    </div>
+                </div>
+
+                <div class="forms">
+                    <section class="form-card">
+                        <div class="section-head">
+                            <div>
+                                <h3>Add person</h3>
+                                <p>Collects the same core fields as `Person.populate()`.</p>
+                            </div>
+                        </div>
+                        <form id="personForm">
+                            <div class="field-grid">
+                                <label>
+                                    Name
+                                    <input id="name" name="name" type="text" maxlength="80" required>
+                                </label>
+                                <label>
+                                    Phone
+                                    <input id="phone" name="phone" type="tel" inputmode="numeric" placeholder="2135550199" required>
+                                </label>
+                            </div>
+                            <label>
+                                Address
+                                <input id="address" name="address" type="text" maxlength="160" required>
+                            </label>
+                            <div class="field-grid">
+                                <label>
+                                    Gender
+                                    <select id="gender" name="gender">
+                                        <option value="">Unspecified</option>
+                                        <option value="M">M</option>
+                                        <option value="F">F</option>
+                                    </select>
+                                </label>
+                                <label>
+                                    Age
+                                    <input id="age" name="age" type="number" min="0" max="130" step="1">
+                                </label>
+                            </div>
+                            <button type="submit">Save person</button>
+                        </form>
+                        <div class="status" id="personStatus"></div>
+                    </section>
+
+                    <section class="form-card">
+                        <div class="section-head">
+                            <div>
+                                <h3>Record marriage</h3>
+                                <p>Updates both selected people to `married = true` and `single = false`.</p>
+                            </div>
+                        </div>
+                        <form id="marriageForm">
+                            <div class="field-grid">
+                                <label>
+                                    Person 1
+                                    <select id="marriagePerson1" name="marriagePerson1" required></select>
+                                </label>
+                                <label>
+                                    Person 2
+                                    <select id="marriagePerson2" name="marriagePerson2" required></select>
+                                </label>
+                            </div>
+                            <button class="secondary" type="submit">Save marriage</button>
+                        </form>
+                        <div class="status" id="marriageStatus"></div>
+                    </section>
+
+                    <section class="form-card">
+                        <div class="section-head">
+                            <div>
+                                <h3>Record divorce</h3>
+                                <p>Matches the Java divorce flow and stores a divorce year for both records.</p>
+                            </div>
+                        </div>
+                        <form id="divorceForm">
+                            <div class="field-grid">
+                                <label>
+                                    Person 1
+                                    <select id="divorcePerson1" name="divorcePerson1" required></select>
+                                </label>
+                                <label>
+                                    Person 2
+                                    <select id="divorcePerson2" name="divorcePerson2" required></select>
+                                </label>
+                            </div>
+                            <label>
+                                Year divorced
+                                <input id="divorceYear" name="divorceYear" type="number" min="1800" max="3000" step="1" required>
+                            </label>
+                            <button type="submit">Save divorce</button>
+                        </form>
+                        <div class="status" id="divorceStatus"></div>
+                    </section>
+                </div>
+            </div>
+
+            <aside class="panel">
+                <div class="section-head">
+                    <div>
+                        <h2>Saved people</h2>
+                        <p>The page reads and writes records through the Java server, backed by MongoDB.</p>
+                    </div>
+                </div>
+                <div class="people-list" id="peopleList"></div>
+            </aside>
+        </section>
+    </main>
+
+    <script>
+        const personForm = document.getElementById("personForm");
+        const marriageForm = document.getElementById("marriageForm");
+        const divorceForm = document.getElementById("divorceForm");
+        const resetButton = document.getElementById("resetButton");
+
+        const personStatus = document.getElementById("personStatus");
+        const marriageStatus = document.getElementById("marriageStatus");
+        const divorceStatus = document.getElementById("divorceStatus");
+
+        const peopleCount = document.getElementById("peopleCount");
+        const marriedCount = document.getElementById("marriedCount");
+        const divorcedCount = document.getElementById("divorcedCount");
+        const peopleList = document.getElementById("peopleList");
+
+        const selects = {
+            marriagePerson1: document.getElementById("marriagePerson1"),
+            marriagePerson2: document.getElementById("marriagePerson2"),
+            divorcePerson1: document.getElementById("divorcePerson1"),
+            divorcePerson2: document.getElementById("divorcePerson2")
+        };
+
+        let people = [];
+
+        function setStatus(node, message, type) {
+            node.textContent = message;
+            node.className = "status" + (type ? " " + type : "");
+        }
+
+        async function request(path, options = {}) {
+            const response = await fetch(path, {
+                headers: {
+                    "Content-Type": "application/json",
+                    ...(options.headers || {})
+                },
+                ...options
+            });
+
+            const isJson = response.headers.get("content-type")?.includes("application/json");
+            const body = isJson ? await response.json() : null;
+            if (!response.ok) {
+                throw new Error(body?.message || "Request failed.");
+            }
+            return body;
+        }
+
+        function normalizePhone(input) {
+            return input.replace(/\D/g, "");
+        }
+
+        function validatePhone(phone) {
+            if (!/^\d{10}$/.test(phone)) {
+                return "Phone number must be exactly 10 digits.";
+            }
+            if (phone.slice(3, 6) === "555") {
+                return "Phone number cannot use a 555 exchange.";
+            }
+            return "";
+        }
+
+        function createPersonRecord(formData) {
+            return {
+                id: crypto.randomUUID(),
+                name: formData.get("name").trim(),
+                address: formData.get("address").trim(),
+                phone: normalizePhone(formData.get("phone")),
+                gender: formData.get("gender"),
+                age: formData.get("age") ? Number(formData.get("age")) : null,
+                married: false,
+                divorced: false,
+                single: true,
+                spouseId: null,
+                yr_divorced: null,
+                history: ["Created record"]
+            };
+        }
+
+        function personLabel(person) {
+            return person ? person.name : "";
+        }
+
+        function relationshipLabel(person) {
+            if (person.divorced) {
+                return { text: "Divorced", className: "pill alert" };
+            }
+            if (person.married) {
+                return { text: "Married", className: "pill warn" };
+            }
+            return { text: "Single", className: "pill" };
+        }
+
+        function renderSelects() {
+            const options = ['<option value="">Choose a person</option>']
+                .concat(people.map(person => `<option value="${person.id}">${escapeHtml(person.name)}</option>`))
+                .join("");
+
+            Object.values(selects).forEach(select => {
+                const current = select.value;
+                select.innerHTML = options;
+                if (people.some(person => person.id === current)) {
+                    select.value = current;
+                }
+            });
+        }
+
+        function renderStats() {
+            peopleCount.textContent = String(people.length);
+            marriedCount.textContent = String(people.filter(person => person.married).length);
+            divorcedCount.textContent = String(people.filter(person => person.divorced).length);
+        }
+
+        function renderPeople() {
+            if (!people.length) {
+                peopleList.innerHTML = '<p class="empty">No saved people yet. Add someone to start the tracker.</p>';
+                return;
+            }
+
+            peopleList.innerHTML = people.map(person => {
+                const pill = relationshipLabel(person);
+                const spouse = people.find(candidate => candidate.id === person.spouseId);
+                const history = person.history.length
+                    ? person.history.map(note => `<div class="timeline-note">${escapeHtml(note)}</div>`).join("")
+                    : '<div class="timeline-note">No history yet.</div>';
+
+                return `
+                    <article class="person-card">
+                        <header>
+                            <div>
+                                <h3>${escapeHtml(person.name)}</h3>
+                            </div>
+                            <span class="${pill.className}">${pill.text}</span>
+                        </header>
+                        <div class="meta">
+                            <div>Phone: ${escapeHtml(formatPhone(person.phone))}</div>
+                            <div>Age: ${person.age ?? "Unspecified"}</div>
+                            <div>Gender: ${escapeHtml(person.gender || "Unspecified")}</div>
+                            <div>Address: ${escapeHtml(person.address)}</div>
+                            <div>Spouse: ${escapeHtml(spouse ? spouse.name : "None")}</div>
+                            <div>Divorce year: ${escapeHtml(person.yr_divorced || "None")}</div>
+                        </div>
+                        <div class="timeline">${history}</div>
+                    </article>
+                `;
+            }).join("");
+        }
+
+        function escapeHtml(value) {
+            return String(value)
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#39;");
+        }
+
+        function formatPhone(phone) {
+            const digits = normalizePhone(phone);
+            if (digits.length !== 10) {
+                return digits;
+            }
+            return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6)}`;
+        }
+
+        function render() {
+            renderStats();
+            renderSelects();
+            renderPeople();
+        }
+
+        async function refresh() {
+            try {
+                people = await request("/api/people", { method: "GET" });
+                render();
+            } catch (error) {
+                setStatus(personStatus, error.message, "error");
+                setStatus(marriageStatus, error.message, "error");
+                setStatus(divorceStatus, error.message, "error");
+            }
+        }
+
+        personForm.addEventListener("submit", async event => {
+            event.preventDefault();
+            const formData = new FormData(personForm);
+            const phone = normalizePhone(formData.get("phone"));
+            const phoneError = validatePhone(phone);
+            const name = formData.get("name").trim();
+            const address = formData.get("address").trim();
+
+            if (!name || !address) {
+                setStatus(personStatus, "Name and address are required.", "error");
+                return;
+            }
+
+            if (phoneError) {
+                setStatus(personStatus, phoneError, "error");
+                return;
+            }
+
+            const duplicate = people.some(person => person.name.toLowerCase() === name.toLowerCase());
+            if (duplicate) {
+                setStatus(personStatus, "That person already exists in the tracker.", "error");
+                return;
+            }
+
+            try {
+                const record = createPersonRecord(formData);
+                record.phone = phone;
+                await request("/api/people", {
+                    method: "POST",
+                    body: JSON.stringify(record)
+                });
+                personForm.reset();
+                setStatus(personStatus, `Saved ${record.name}.`, "success");
+                await refresh();
+            } catch (error) {
+                setStatus(personStatus, error.message, "error");
+            }
+        });
+
+        marriageForm.addEventListener("submit", async event => {
+            event.preventDefault();
+            const person1Id = selects.marriagePerson1.value;
+            const person2Id = selects.marriagePerson2.value;
+
+            if (!person1Id || !person2Id) {
+                setStatus(marriageStatus, "Choose two people first.", "error");
+                return;
+            }
+
+            if (person1Id === person2Id) {
+                setStatus(marriageStatus, "A person cannot marry themselves here.", "error");
+                return;
+            }
+
+            const person1 = people.find(person => person.id === person1Id);
+            const person2 = people.find(person => person.id === person2Id);
+
+            if (!person1 || !person2) {
+                setStatus(marriageStatus, "One of the selected people could not be found.", "error");
+                return;
+            }
+
+            if (person1.married || person2.married) {
+                setStatus(marriageStatus, "One of those people is already marked as married.", "error");
+                return;
+            }
+
+            try {
+                const result = await request("/api/marriages", {
+                    method: "POST",
+                    body: JSON.stringify({ person1Id, person2Id })
+                });
+                marriageForm.reset();
+                setStatus(marriageStatus, result.message, "success");
+                await refresh();
+            } catch (error) {
+                setStatus(marriageStatus, error.message, "error");
+            }
+        });
+
+        divorceForm.addEventListener("submit", async event => {
+            event.preventDefault();
+            const person1Id = selects.divorcePerson1.value;
+            const person2Id = selects.divorcePerson2.value;
+            const year = divorceForm.divorceYear.value.trim();
+
+            if (!person1Id || !person2Id || !year) {
+                setStatus(divorceStatus, "Choose two people and enter a divorce year.", "error");
+                return;
+            }
+
+            if (person1Id === person2Id) {
+                setStatus(divorceStatus, "Choose two different people.", "error");
+                return;
+            }
+
+            const person1 = people.find(person => person.id === person1Id);
+            const person2 = people.find(person => person.id === person2Id);
+
+            if (!person1 || !person2) {
+                setStatus(divorceStatus, "One of the selected people could not be found.", "error");
+                return;
+            }
+
+            const linkedMarriage = person1.spouseId === person2.id && person2.spouseId === person1.id;
+            if (!linkedMarriage) {
+                setStatus(divorceStatus, "Those two people are not currently linked as spouses.", "error");
+                return;
+            }
+
+            try {
+                const result = await request("/api/divorces", {
+                    method: "POST",
+                    body: JSON.stringify({ person1Id, person2Id, year })
+                });
+                divorceForm.reset();
+                setStatus(divorceStatus, result.message, "success");
+                await refresh();
+            } catch (error) {
+                setStatus(divorceStatus, error.message, "error");
+            }
+        });
+
+        resetButton.addEventListener("click", async () => {
+            try {
+                await request("/api/people", { method: "DELETE" });
+                people = [];
+                personForm.reset();
+                marriageForm.reset();
+                divorceForm.reset();
+                setStatus(personStatus, "", "");
+                setStatus(marriageStatus, "", "");
+                setStatus(divorceStatus, "", "");
+                render();
+            } catch (error) {
+                setStatus(personStatus, error.message, "error");
+            }
+        });
+
+        refresh();
+    </script>
+</body>
+</html>

@@ -46,6 +46,6 @@ public class Person {
     public static void main(String[] args) {
         System.out.println("Person initalized. PersonFileEditor initalizing");
         PersonFileEditor pfe = new PersonFileEditor();
-        System.out.println("PersonFileEditor initalized.")
+        System.out.println("PersonFileEditor initalized.");
     }
 }
