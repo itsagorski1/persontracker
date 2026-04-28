@@ -2,6 +2,7 @@ package com.jonah.code.java.random.persontracker.person;
 
 import java.util.HashMap;
 import java.util.Scanner;
+import com.jonah.code.java.random.persontracker.person.personfileeditor.PersonFileEditor;
 
 public class Person {
     public HashMap<String, String> person = new HashMap<>();
@@ -43,6 +44,8 @@ public class Person {
         person.put("phone", phone());
     }
     public static void main(String[] args) {
-        System.out.println("Person initalized.");
+        System.out.println("Person initalized. PersonFileEditor initalizing");
+        PersonFileEditor pfe = new PersonFileEditor();
+        System.out.println("PersonFileEditor initalized.")
     }
 }

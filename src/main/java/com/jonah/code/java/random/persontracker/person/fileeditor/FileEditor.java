@@ -6,10 +6,10 @@ import java.io.InputStreamReader;
 import java.util.Arrays;
 
 public class FileEditor {
-    public FileEditor(String fileName, String type, String[] ppl, String content) {
+    public FileEditor(String type, String[] ppl, String content) {
         String pythonCommand = "python3"; // or "python" depending on your system
         String pythonScript = "'C:\\Users\\jonah\\code\\java\\random\\persontracker\\Epython\\FileEditor.py'";
-        ProcessBuilder processBuilder = new ProcessBuilder(pythonCommand, pythonScript, fileName, type, Arrays.toString(ppl), content);
+        ProcessBuilder processBuilder = new ProcessBuilder(pythonCommand, pythonScript, type, Arrays.toString(ppl), content);
         try {
             Process process = processBuilder.start();
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
