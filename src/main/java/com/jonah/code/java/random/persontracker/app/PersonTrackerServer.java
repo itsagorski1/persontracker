@@ -1,11 +1,5 @@
 package com.jonah.code.java.random.persontracker.app;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.HttpServer;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -16,19 +10,31 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 import java.util.concurrent.Executors;
+import java.util.stream.Stream;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sun.net.httpserver.HttpExchange;
+import com.sun.net.httpserver.HttpServer;
 
 public class PersonTrackerServer {
     private static final ObjectMapper MAPPER = new ObjectMapper()
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-    private static final int PORT = Integer.parseInt(System.getenv().getOrDefault("PERSON_TRACKER_PORT", "8080"));
+    private static final int PORT = Integer.parseInt(System.getenv().getOrDefault(
+            "PORT",
+            System.getenv().getOrDefault("PERSON_TRACKER_PORT", "8080")
+    ));
     private static final String MONGO_URI = System.getenv().getOrDefault("PERSON_TRACKER_MONGO_URI", "mongodb://localhost:27017");
     private static final String MONGO_DB = System.getenv().getOrDefault("PERSON_TRACKER_MONGO_DB", "persontracker");
+    private static final String ALLOWED_ORIGINS = System.getenv().getOrDefault("PERSON_TRACKER_ALLOWED_ORIGIN", "*");
 
     public static void main(String[] args) throws IOException {
         MongoPersonRepository repository = new MongoPersonRepository(MONGO_URI, MONGO_DB);
         Runtime.getRuntime().addShutdownHook(new Thread(repository::close));
 
         HttpServer server = HttpServer.create(new InetSocketAddress(PORT), 0);
+        server.createContext("/healthz", exchange -> handleHealth(exchange, repository));
         server.createContext("/api/people", exchange -> handlePeople(exchange, repository));
         server.createContext("/api/marriages", exchange -> handleMarriage(exchange, repository));
         server.createContext("/api/divorces", exchange -> handleDivorce(exchange, repository));
@@ -38,6 +44,21 @@ public class PersonTrackerServer {
 
         System.out.println("Person Tracker server listening on http://localhost:" + PORT);
         System.out.println("MongoDB: " + MONGO_URI + " / database: " + MONGO_DB);
+    }
+
+    private static void handleHealth(HttpExchange exchange, MongoPersonRepository repository) throws IOException {
+        addCorsHeaders(exchange);
+        if (!"GET".equalsIgnoreCase(exchange.getRequestMethod())) {
+            sendError(exchange, 405, "Method not allowed.");
+            return;
+        }
+
+        if (repository.ping()) {
+            sendJson(exchange, 200, new MessageResponse("ok"));
+            return;
+        }
+
+        sendJson(exchange, 503, new MessageResponse("database unavailable"));
     }
 
     private static void handlePeople(HttpExchange exchange, MongoPersonRepository repository) throws IOException {
@@ -86,10 +107,9 @@ public class PersonTrackerServer {
 
         if ("DELETE".equalsIgnoreCase(exchange.getRequestMethod())) {
             repository.deleteAll();
-            sendJson(exchange, 200, new MessageResponse("All people removed."));
+            sendJson(exchange, 200, new MessageResponse("Cleared all people."));
             return;
         }
-
         sendError(exchange, 405, "Method not allowed.");
     }
 
@@ -291,9 +311,27 @@ public class PersonTrackerServer {
     }
 
     private static void addCorsHeaders(HttpExchange exchange) {
-        exchange.getResponseHeaders().set("Access-Control-Allow-Origin", "*");
+        exchange.getResponseHeaders().set("Access-Control-Allow-Origin", resolveAllowedOrigin(exchange));
         exchange.getResponseHeaders().set("Access-Control-Allow-Methods", "GET,POST,DELETE,OPTIONS");
         exchange.getResponseHeaders().set("Access-Control-Allow-Headers", "Content-Type");
+    }
+
+    private static String resolveAllowedOrigin(HttpExchange exchange) {
+        if ("*".equals(ALLOWED_ORIGINS.trim())) {
+            return "*";
+        }
+
+        String requestOrigin = exchange.getRequestHeaders().getFirst("Origin");
+        if (requestOrigin == null || requestOrigin.isBlank()) {
+            return "null";
+        }
+
+        return Stream.of(ALLOWED_ORIGINS.split(","))
+                .map(String::trim)
+                .filter(origin -> !origin.isBlank())
+                .filter(origin -> origin.equalsIgnoreCase(requestOrigin))
+                .findFirst()
+                .orElse("null");
     }
 
     private static boolean handleOptions(HttpExchange exchange) throws IOException {

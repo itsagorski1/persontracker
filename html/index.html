@@ -6,16 +6,17 @@
     <title>Person Tracker</title>
     <style>
         :root {
-            --bg: #f4efe7;
-            --panel: rgba(255, 252, 247, 0.92);
-            --panel-strong: #fffaf3;
-            --ink: #1e1b18;
-            --muted: #645a4f;
-            --line: rgba(57, 45, 33, 0.12);
-            --accent: #0d7a68;
-            --accent-2: #d77a3d;
-            --danger: #a33f3f;
-            --shadow: 0 18px 50px rgba(47, 31, 14, 0.12);
+            --bg: #efe4d3;
+            --panel: rgba(255, 250, 242, 0.92);
+            --panel-strong: #fffdf9;
+            --ink: #1c1814;
+            --muted: #66584d;
+            --line: rgba(74, 52, 35, 0.14);
+            --accent: #0f7a67;
+            --accent-dark: #0b5f51;
+            --accent-warm: #c86b2e;
+            --danger: #a23f3f;
+            --shadow: 0 20px 60px rgba(74, 52, 35, 0.14);
             --radius: 8px;
         }
 
@@ -26,12 +27,12 @@
         body {
             margin: 0;
             min-height: 100vh;
-            font-family: Georgia, "Times New Roman", serif;
             color: var(--ink);
+            font-family: Georgia, "Times New Roman", serif;
             background:
-                radial-gradient(circle at top left, rgba(215, 122, 61, 0.16), transparent 34%),
-                radial-gradient(circle at top right, rgba(13, 122, 104, 0.14), transparent 30%),
-                linear-gradient(180deg, #f8f1e8 0%, #efe5d8 100%);
+                radial-gradient(circle at top left, rgba(200, 107, 46, 0.18), transparent 34%),
+                radial-gradient(circle at top right, rgba(15, 122, 103, 0.16), transparent 30%),
+                linear-gradient(180deg, #f7efe4 0%, var(--bg) 100%);
         }
 
         .shell {
@@ -56,10 +57,13 @@
             gap: 18px;
         }
 
-        .hero-top {
+        .hero-top,
+        .section-head,
+        .person-card header,
+        .toolbar {
             display: flex;
             justify-content: space-between;
-            gap: 18px;
+            gap: 12px;
             align-items: start;
         }
 
@@ -71,26 +75,43 @@
         }
 
         h1 {
-            font-size: clamp(2.2rem, 5vw, 4.4rem);
+            font-size: clamp(2.4rem, 5vw, 4.6rem);
             font-weight: 600;
             line-height: 0.94;
         }
 
-        .hero p,
-        .panel p,
+        h2 {
+            font-size: 1.55rem;
+        }
+
+        h3 {
+            font-size: 1.1rem;
+        }
+
+        .lede,
+        .section-head p,
         label,
         input,
         select,
         button,
         .status,
         .timeline-note,
-        .empty {
+        .empty,
+        .note {
             font-size: 0.98rem;
         }
 
-        .lede {
-            max-width: 680px;
+        .lede,
+        .section-head p,
+        .meta,
+        .timeline-note,
+        .note,
+        label {
             color: var(--muted);
+        }
+
+        .lede {
+            max-width: 700px;
             line-height: 1.55;
         }
 
@@ -100,15 +121,18 @@
             gap: 12px;
         }
 
-        .stat {
+        .stat,
+        .form-card {
             background: var(--panel-strong);
             border: 1px solid var(--line);
             border-radius: var(--radius);
+        }
+
+        .stat {
             padding: 16px;
         }
 
         .stat-label {
-            color: var(--muted);
             margin-bottom: 8px;
         }
 
@@ -127,42 +151,22 @@
             padding: 20px;
         }
 
-        .panel-grid {
+        .panel-grid,
+        .forms,
+        .form-card,
+        form,
+        .people-list,
+        .timeline {
             display: grid;
-            gap: 18px;
-        }
-
-        .forms {
-            display: grid;
-            gap: 18px;
+            gap: 16px;
         }
 
         .form-card {
-            background: var(--panel-strong);
-            border: 1px solid var(--line);
-            border-radius: var(--radius);
             padding: 18px;
-            display: grid;
-            gap: 14px;
         }
 
-        .section-head {
-            display: flex;
-            justify-content: space-between;
-            gap: 12px;
-            align-items: baseline;
-        }
-
-        .section-head p {
-            color: var(--muted);
-        }
-
-        form {
-            display: grid;
-            gap: 12px;
-        }
-
-        .field-grid {
+        .field-grid,
+        .meta {
             display: grid;
             grid-template-columns: repeat(2, minmax(0, 1fr));
             gap: 12px;
@@ -171,7 +175,6 @@
         label {
             display: grid;
             gap: 6px;
-            color: var(--muted);
         }
 
         input,
@@ -183,7 +186,7 @@
         input,
         select {
             width: 100%;
-            border: 1px solid rgba(57, 45, 33, 0.18);
+            border: 1px solid rgba(74, 52, 35, 0.18);
             border-radius: 6px;
             background: #fffdf9;
             padding: 12px 13px;
@@ -192,7 +195,7 @@
 
         input:focus,
         select:focus {
-            outline: 2px solid rgba(13, 122, 104, 0.24);
+            outline: 2px solid rgba(15, 122, 103, 0.24);
             border-color: var(--accent);
         }
 
@@ -200,8 +203,8 @@
             border: 0;
             border-radius: 6px;
             padding: 12px 16px;
-            color: white;
-            background: linear-gradient(135deg, var(--accent), #0b5f52);
+            color: #fff;
+            background: linear-gradient(135deg, var(--accent), var(--accent-dark));
             cursor: pointer;
             transition: transform 140ms ease, filter 140ms ease;
         }
@@ -212,17 +215,16 @@
         }
 
         button.secondary {
-            background: linear-gradient(135deg, var(--accent-2), #b35a23);
+            background: linear-gradient(135deg, var(--accent-warm), #aa5420);
         }
 
         button.ghost {
-            background: #f1e7d8;
+            background: #f0e4d2;
             color: var(--ink);
         }
 
         .status {
             min-height: 1.4em;
-            color: var(--muted);
         }
 
         .status.error {
@@ -233,25 +235,11 @@
             color: var(--accent);
         }
 
-        .people-list {
-            display: grid;
-            gap: 12px;
-        }
-
         .person-card {
+            padding: 16px;
             background: var(--panel-strong);
             border: 1px solid var(--line);
             border-radius: var(--radius);
-            padding: 16px;
-            display: grid;
-            gap: 10px;
-        }
-
-        .person-card header {
-            display: flex;
-            justify-content: space-between;
-            gap: 12px;
-            align-items: center;
         }
 
         .pill {
@@ -275,27 +263,17 @@
             color: #893434;
         }
 
-        .meta {
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 8px 14px;
-            color: var(--muted);
-        }
-
-        .timeline {
-            display: grid;
-            gap: 8px;
-        }
-
         .timeline-note {
             padding-left: 12px;
-            border-left: 2px solid rgba(13, 122, 104, 0.26);
-            color: var(--muted);
+            border-left: 2px solid rgba(15, 122, 103, 0.26);
             line-height: 1.45;
         }
 
+        .toolbar {
+            flex-wrap: wrap;
+        }
+
         .empty {
-            color: var(--muted);
             padding: 24px 0;
         }
 
@@ -308,9 +286,10 @@
         @media (max-width: 680px) {
             .hero-top,
             .section-head,
-            .person-card header {
+            .person-card header,
+            .toolbar {
                 flex-direction: column;
-                align-items: start;
+                align-items: stretch;
             }
 
             .hero-stats,
@@ -336,15 +315,10 @@
         <section class="hero">
             <div class="hero-top">
                 <div>
-                    <p class="pill">Browser version of the Java tracker</p>
                     <h1>Person Tracker</h1>
+                    <p class="lede">A static, GitHub Pages friendly tracker for storing people, marriages, divorces, and relationship history right in the browser.</p>
                 </div>
-                <button class="ghost" id="resetButton" type="button">Clear saved data</button>
             </div>
-            <p class="lede">
-                This page turns the Java classes in `src/main/java` into a working interface. It keeps person records,
-                tracks marriage status, records divorce years, and stores everything in MongoDB through a small Java API.
-            </p>
             <div class="hero-stats">
                 <div class="stat">
                     <div class="stat-label">People stored</div>
@@ -366,7 +340,7 @@
                 <div class="section-head">
                     <div>
                         <h2>Tracker actions</h2>
-                        <p>Built from the Java `Person`, `Marriage`, and `Divorce` flows.</p>
+                        <p>Use this page from GitHub Pages while the shared data lives in MongoDB behind the API.</p>
                     </div>
                 </div>
 
@@ -375,7 +349,6 @@
                         <div class="section-head">
                             <div>
                                 <h3>Add person</h3>
-                                <p>Collects the same core fields as `Person.populate()`.</p>
                             </div>
                         </div>
                         <form id="personForm">
@@ -386,7 +359,7 @@
                                 </label>
                                 <label>
                                     Phone
-                                    <input id="phone" name="phone" type="phone" inputmode="numeric" placeholder="2135550199" required>
+                                    <input id="phone" name="phone" type="tel" inputmode="numeric" placeholder="2135550199" required>
                                 </label>
                             </div>
                             <label>
@@ -416,7 +389,6 @@
                         <div class="section-head">
                             <div>
                                 <h3>Record marriage</h3>
-                                <p>Updates both selected people to `married = true` and `single = false`.</p>
                             </div>
                         </div>
                         <form id="marriageForm">
@@ -439,7 +411,7 @@
                         <div class="section-head">
                             <div>
                                 <h3>Record divorce</h3>
-                                <p>Matches the Java divorce flow and stores a divorce year for both records.</p>
+                                <p>Stores a divorce year on both records and appends history entries.</p>
                             </div>
                         </div>
                         <form id="divorceForm">
@@ -468,18 +440,31 @@
                 <div class="section-head">
                     <div>
                         <h2>Saved people</h2>
-                        <p>The page reads and writes records through the Java server, backed by MongoDB.</p>
+                        <p>All devices see the same people when they point at the same backend API.</p>
                     </div>
+                </div>
+                <div class="toolbar">
+                    <label>
+                        <span class="note">API base URL</span>
+                        <input id="apiBaseInput" type="url" placeholder="https://your-backend.example.com">
+                    </label>
+                    <button class="ghost" id="saveApiButton" type="button">Save API URL</button>
+                    <button class="ghost" id="resetButton" type="button">Clear tracker</button>
                 </div>
                 <div class="people-list" id="peopleList"></div>
             </aside>
         </section>
     </main>
 
+    <script src="./config.js"></script>
     <script>
+        const API_BASE_STORAGE_KEY = "person-tracker-api-base";
+
         const personForm = document.getElementById("personForm");
         const marriageForm = document.getElementById("marriageForm");
         const divorceForm = document.getElementById("divorceForm");
+        const apiBaseInput = document.getElementById("apiBaseInput");
+        const saveApiButton = document.getElementById("saveApiButton");
         const resetButton = document.getElementById("resetButton");
 
         const personStatus = document.getElementById("personStatus");
@@ -505,8 +490,56 @@
             node.className = "status" + (type ? " " + type : "");
         }
 
+        function clearStatuses() {
+            setStatus(personStatus, "", "");
+            setStatus(marriageStatus, "", "");
+            setStatus(divorceStatus, "", "");
+        }
+
+        function getQueryParam(name) {
+            return new URLSearchParams(window.location.search).get(name) || "";
+        }
+
+        function normalizeApiBase(input) {
+            const value = String(input || "").trim();
+            if (!value) {
+                return "";
+            }
+            return value.replace(/\/+$/, "");
+        }
+
+        function getStoredApiBase() {
+            return normalizeApiBase(localStorage.getItem(API_BASE_STORAGE_KEY));
+        }
+
+        function getApiBase() {
+            const configuredBase = normalizeApiBase(window.PERSON_TRACKER_CONFIG?.apiBaseUrl);
+            if (configuredBase) {
+                return configuredBase;
+            }
+            const queryBase = normalizeApiBase(getQueryParam("api"));
+            if (queryBase) {
+                return queryBase;
+            }
+            const storedBase = getStoredApiBase();
+            if (storedBase) {
+                return storedBase;
+            }
+            return normalizeApiBase(window.location.origin);
+        }
+
+        function setApiBase(value) {
+            const normalized = normalizeApiBase(value);
+            if (normalized) {
+                localStorage.setItem(API_BASE_STORAGE_KEY, normalized);
+            } else {
+                localStorage.removeItem(API_BASE_STORAGE_KEY);
+            }
+            apiBaseInput.value = normalized;
+        }
+
         async function request(path, options = {}) {
-            const response = await fetch(path, {
+            const response = await fetch(getApiBase() + path, {
                 headers: {
                     "Content-Type": "application/json",
                     ...(options.headers || {})
@@ -523,7 +556,7 @@
         }
 
         function normalizePhone(input) {
-            return input.replace(/\D/g, "");
+            return String(input || "").replace(/\D/g, "");
         }
 
         function validatePhone(phone) {
@@ -536,12 +569,27 @@
             return "";
         }
 
+        function timestamp() {
+            const now = new Date();
+            const parts = [
+                now.getFullYear(),
+                String(now.getMonth() + 1).padStart(2, "0"),
+                String(now.getDate()).padStart(2, "0")
+            ];
+            const time = [
+                String(now.getHours()).padStart(2, "0"),
+                String(now.getMinutes()).padStart(2, "0")
+            ];
+            return parts.join("-") + " " + time.join(":");
+        }
+
         function createPersonRecord(formData) {
+            const phone = normalizePhone(formData.get("phone"));
             return {
                 id: crypto.randomUUID(),
                 name: formData.get("name").trim(),
                 address: formData.get("address").trim(),
-                phone: normalizePhone(formData.get("phone")),
+                phone,
                 gender: formData.get("gender"),
                 age: formData.get("age") ? Number(formData.get("age")) : null,
                 married: false,
@@ -549,12 +597,8 @@
                 single: true,
                 spouseId: null,
                 yr_divorced: null,
-                history: ["Created record"]
+                history: ["Created record on " + timestamp()]
             };
-        }
-
-        function personLabel(person) {
-            return person ? person.name : "";
         }
 
         function relationshipLabel(person) {
@@ -565,6 +609,23 @@
                 return { text: "Married", className: "pill warn" };
             }
             return { text: "Single", className: "pill" };
+        }
+
+        function escapeHtml(value) {
+            return String(value ?? "")
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#39;");
+        }
+
+        function formatPhone(phone) {
+            const digits = normalizePhone(phone);
+            if (digits.length !== 10) {
+                return digits || "Unspecified";
+            }
+            return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6)}`;
         }
 
         function renderSelects() {
@@ -596,7 +657,7 @@
             peopleList.innerHTML = people.map(person => {
                 const pill = relationshipLabel(person);
                 const spouse = people.find(candidate => candidate.id === person.spouseId);
-                const history = person.history.length
+                const history = Array.isArray(person.history) && person.history.length
                     ? person.history.map(note => `<div class="timeline-note">${escapeHtml(note)}</div>`).join("")
                     : '<div class="timeline-note">No history yet.</div>';
 
@@ -612,7 +673,7 @@
                             <div>Phone: ${escapeHtml(formatPhone(person.phone))}</div>
                             <div>Age: ${person.age ?? "Unspecified"}</div>
                             <div>Gender: ${escapeHtml(person.gender || "Unspecified")}</div>
-                            <div>Address: ${escapeHtml(person.address)}</div>
+                            <div>Address: ${escapeHtml(person.address || "Unspecified")}</div>
                             <div>Spouse: ${escapeHtml(spouse ? spouse.name : "None")}</div>
                             <div>Divorce year: ${escapeHtml(person.yr_divorced || "None")}</div>
                         </div>
@@ -622,27 +683,17 @@
             }).join("");
         }
 
-        function escapeHtml(value) {
-            return String(value)
-                .replace(/&/g, "&amp;")
-                .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;")
-                .replace(/"/g, "&quot;")
-                .replace(/'/g, "&#39;");
-        }
-
-        function formatPhone(phone) {
-            const digits = normalizePhone(phone);
-            if (digits.length !== 10) {
-                return digits;
-            }
-            return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6)}`;
-        }
-
         function render() {
             renderStats();
             renderSelects();
             renderPeople();
+        }
+
+        function persistAndRender(successNode, successMessage) {
+            render();
+            if (successNode && successMessage) {
+                setStatus(successNode, successMessage, "success");
+            }
         }
 
         async function refresh() {
@@ -656,13 +707,22 @@
             }
         }
 
+        saveApiButton.addEventListener("click", async () => {
+            setApiBase(apiBaseInput.value);
+            clearStatuses();
+            await refresh();
+            if (!personStatus.textContent && !marriageStatus.textContent && !divorceStatus.textContent) {
+                setStatus(personStatus, "Saved API URL.", "success");
+            }
+        });
+
         personForm.addEventListener("submit", async event => {
             event.preventDefault();
             const formData = new FormData(personForm);
-            const phone = normalizePhone(formData.get("phone"));
-            const phoneError = validatePhone(phone);
             const name = formData.get("name").trim();
             const address = formData.get("address").trim();
+            const phone = normalizePhone(formData.get("phone"));
+            const phoneError = validatePhone(phone);
 
             if (!name || !address) {
                 setStatus(personStatus, "Name and address are required.", "error");
@@ -682,7 +742,6 @@
 
             try {
                 const record = createPersonRecord(formData);
-                record.phone = phone;
                 await request("/api/people", {
                     method: "POST",
                     body: JSON.stringify(record)
@@ -786,15 +845,14 @@
                 personForm.reset();
                 marriageForm.reset();
                 divorceForm.reset();
-                setStatus(personStatus, "", "");
-                setStatus(marriageStatus, "", "");
-                setStatus(divorceStatus, "", "");
+                clearStatuses();
                 render();
             } catch (error) {
                 setStatus(personStatus, error.message, "error");
             }
         });
 
+        apiBaseInput.value = getApiBase();
         refresh();
     </script>
 </body>

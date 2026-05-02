@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: persontracker-api
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    autoDeployTrigger: commit
+    healthCheckPath: /healthz
+    envVars:
+      - key: PERSON_TRACKER_MONGO_URI
+        sync: false
+      - key: PERSON_TRACKER_MONGO_DB
+        value: persontracker
+      - key: PERSON_TRACKER_ALLOWED_ORIGIN
+        sync: false

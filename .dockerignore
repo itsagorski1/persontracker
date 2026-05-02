@@ -1,0 +1,8 @@
+.git
+.gradle
+.gradle-user-home
+build
+.idea
+python
+run.ps1
+SESSION_HANDOFF.md

@@ -17,11 +17,12 @@ import java.util.Optional;
 
 public class MongoPersonRepository implements AutoCloseable {
     private final MongoClient client;
+    private final MongoDatabase database;
     private final MongoCollection<Document> peopleCollection;
 
     public MongoPersonRepository(String connectionString, String databaseName) {
         this.client = MongoClients.create(connectionString);
-        MongoDatabase database = client.getDatabase(databaseName);
+        this.database = client.getDatabase(databaseName);
         this.peopleCollection = database.getCollection("people");
         this.peopleCollection.createIndex(Indexes.ascending("nameLower"), new IndexOptions().unique(true));
     }
@@ -55,6 +56,15 @@ public class MongoPersonRepository implements AutoCloseable {
 
     public void deleteAll() {
         peopleCollection.deleteMany(new Document());
+    }
+
+    public boolean ping() {
+        try {
+            database.runCommand(new Document("ping", 1));
+            return true;
+        } catch (RuntimeException error) {
+            return false;
+        }
     }
 
     private Document toDocument(TrackerPerson person) {
